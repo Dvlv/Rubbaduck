@@ -3,6 +3,7 @@ import threading
 import time
 import random
 
+
 def setup():
     root = tkinter.Tk()
     root.title("Rubbaduck Instant Messenger")
@@ -18,8 +19,8 @@ def setup():
     default_message = tkinter.Label(frame_left, text="Duck: Hi, please explain your problem to me!", bg='#EFEFEF',
                                     fg='black', justify=tkinter.LEFT, anchor=tkinter.W, padx=10, pady=5)
 
-    input_box = tkinter.Entry(frame_bottom, bg='white', fg='black')
-    send_button = tkinter.Button(frame_bottom, text="Send Message", bg='grey')
+    input_box = tkinter.Text(frame_bottom, bg='white', fg='black', height=3, width=20)
+    send_button = tkinter.Button(frame_bottom, text="Send Message", bg='grey', pady=18)
     typing_display = tkinter.Label(frame_bottom)
 
     user_profile_pic = tkinter.PhotoImage(file="default.png")
@@ -60,17 +61,26 @@ def setup():
         nonlocal default_message
         nonlocal typing_display
 
-        if input_box.get():
-            message = input_box.get()
-            message_text = 'Me: ' + message
+        message = input_box.get(1.0, tkinter.END).strip()
+        if message:
+            message_text = '  Me: ' + message
             message_log = default_message.cget('text')
+
+            max_length = 65
+
+            if len(message_text) > max_length:
+                message_text_pieces = [message_text[i:i+max_length] for i in range(0, len(message_text), max_length)]
+                for i in range(1, len(message_text_pieces)):
+                    message_text_pieces[i] = '          ' + message_text_pieces[i]
+
+                message_text = '\n'.join(message_text_pieces)
 
             new_message = tkinter.Label(frame_left, fg='black', bg='white', justify=tkinter.LEFT, anchor=tkinter.W,
                                         padx=10, pady=5)
             new_message.configure(text=message_text)
             new_message.pack(fill=tkinter.X)
 
-            input_box.delete(0, 'end')
+            input_box.delete(1.0, 'end')
 
             if not typing_display.cget('text'):
                 replying_thread = threading.Thread(target=duck_reply, args=(message,))
@@ -95,7 +105,6 @@ def setup():
 
             canvas.yview_scroll(move, 'units')
 
-
     send_button.configure(command=send_message)
 
     root.bind('<Return>', send_message)
@@ -104,15 +113,11 @@ def setup():
     root.bind_all('<Button-4>', lambda event, canvas=canvas: mouse_scroll(event, canvas))
     root.bind_all('<Button-5>', lambda event, canvas=canvas: mouse_scroll(event, canvas))
 
-
-
-
     canvas.pack(side=tkinter.LEFT, fill=tkinter.BOTH, expand=1)
     canvas_frame = canvas.create_window((4, 4), window=frame_left, anchor="nw")
     vertscroll.pack(side=tkinter.RIGHT, fill=tkinter.Y)
     canvas.bind('<Configure>', lambda event, canvas_frame=canvas_frame: chat_width(event, canvas_frame))
 
-    #frame_left.pack(fill=tkinter.BOTH, expand=1)
     typing_display.pack(side=tkinter.BOTTOM)
     default_message.pack(side=tkinter.TOP, fill=tkinter.X)
 
@@ -124,14 +129,9 @@ def setup():
     input_box.pack(side=tkinter.LEFT, fill=tkinter.X, expand=1, pady=5)
     send_button.pack(side=tkinter.RIGHT, pady=5)
 
-
-
-
     return root
 
 
 if __name__ == '__main__':
     root = setup()
     root.mainloop()
-
-
