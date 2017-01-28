@@ -80,7 +80,7 @@ def setup():
             new_message.configure(text=message_text)
             new_message.pack(fill=tkinter.X)
 
-            input_box.delete(1.0, 'end')
+            input_box.delete(1.0, tkinter.END)
 
             if not typing_display.cget('text'):
                 replying_thread = threading.Thread(target=duck_reply, args=(message,))
