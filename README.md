@@ -21,4 +21,5 @@ Then explain your code to the duck.
 
 ## Licence
 GPL v2 (See COPYING)
+
 Duck image credit: https://commons.wikimedia.org/wiki/File:Cyberduck_icon.png
